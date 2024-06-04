@@ -11,9 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('passwords', function (Blueprint $table) {
+        Schema::create('clients', function (Blueprint $table) {
             $table->id();
-            $table->string('password');
+            $table->string('full_name')->nullable(false);
+            $table->string('shop_name');
+            $table->string('cpf', 11)->unique();
+            $table->string('cnpj', 14)->unique();
+            $table->string('email')->unique()->nullable(false);
+            $table->string('password')->nullable(false);
             $table->timestamps();
             $table->softDeletes();
         });
@@ -24,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('passwords');
+        Schema::dropIfExists('clients');
     }
 };

@@ -11,13 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('clients', function (Blueprint $table) {
+        Schema::create('accounts', function (Blueprint $table) {
             $table->id();
-            $table->string('full_name');
-            $table->string('nick_name');
-            $table->string('cpf', 11)->unique();
-            $table->string('email')->unique();
-            $table->foreignId('password_id')->constrained('passwords');
+            $table->foreignId('account_owner_id')->constrained('clients')->nullable(false);
+            $table->float('balance')->default(0)->nullable(false);
+            $table->enum('account_type', ['client', 'shop'])->nullable(false);
             $table->timestamps();
             $table->softDeletes();
         });
@@ -28,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('clients');
+        Schema::dropIfExists('accounts');
     }
 };

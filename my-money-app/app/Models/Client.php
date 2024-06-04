@@ -12,17 +12,18 @@ class Client extends Model
 
     protected $fillable = [
         'full_name',
-        'nick_name',
+        'shop_name',
         'cpf',
+        'cnpj',
         'email',
-        'password_id',
+        'password',
     ];
 
     protected $hidden = [
-        'password_id'
+        'password'
     ];
 
-    public function password() {
-        return $this->belongsTo(Password::class);
+    public function accounts() {
+        return $this->hasMany(Account::class, 'account_owner_id');
     }
 }
