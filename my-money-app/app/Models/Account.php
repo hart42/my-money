@@ -16,6 +16,10 @@ class Account extends Model
         'account_type',
     ];
 
+    protected $casts = [
+        'balance' => 'decimal:2',
+    ];
+
     public function owner() {
         return $this->belongsTo(Client::class, 'account_owner_id');
     }
