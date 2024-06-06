@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('passwords', function (Blueprint $table) {
+        Schema::create('accounts', function (Blueprint $table) {
             $table->id();
-            $table->string('password');
+            $table->foreignId('account_owner_id')->constrained('clients')->nullable(false);
+            $table->float('balance')->default(0.00)->nullable(false);
+            $table->enum('account_type', ['client', 'shop'])->nullable(false);
             $table->timestamps();
             $table->softDeletes();
         });
@@ -24,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('passwords');
+        Schema::dropIfExists('accounts');
     }
 };

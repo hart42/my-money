@@ -16,11 +16,62 @@
 #     ports:
 #     - 3306:3306
 
+# version: '3.9'
+
+# services:
+
+#   # Web Server Service
+#   nginx:
+#     image: nginx:alpine
+#     container_name: nginx
+#     ports:
+#       - "8080:80"
+#     volumes:
+#       - ./my-money-app:/var/www
+#       - ./dockerFiles/nginx/conf.d/:/etc/nginx/conf.d/
+#     depends_on:
+#       - my-money-laravel
+#       - db
+
+#   #Database Service
+#   db:
+#     image : mysql
+#     container_name : mysql-my-money
+#     volumes:
+#       - ./mysql/data:/var/lib/mysql
+#     ports:
+#       - "3306:3306"
+#     environment:
+#       MYSQL_DATABASE: my_money_db
+#       MYSQL_ROOT_PASSWORD: password
+#   # db:
+#   #   image: postgres
+#   #   container_name: postgres
+#   #   volumes:
+#   #     - ./postgresql/data:/var/lib/postgresql/data
+#   #   ports:
+#   #     - "5432:5432"
+#   #   environment: 
+#   #     POSTGRES_DB: blog
+#   #     POSTGRES_USER: root 
+#   #     POSTGRES_PASSWORD: password 
+
+#   # Application Service
+#   my-money-laravel:
+#     container_name: my-money-laravel
+#     build: 
+#       context: ./dockerFiles/php
+#       dockerfile: Dockerfile
+#     volumes:
+#       - ./my-money-app:/var/www
+#     ports:
+#       - "9000:9000"
+#     working_dir: /var/www
+
 version: '3.9'
 
 services:
-
-  # Web Server Service
+  #Web Server Service
   nginx:
     image: nginx:alpine
     container_name: nginx
@@ -33,10 +84,10 @@ services:
       - my-money-laravel
       - db
 
-  #Database Service
+  # Database Service
   db:
-    image : mysql
-    container_name : mysql-my-money
+    image: mysql
+    container_name: mysql-my-money
     volumes:
       - ./mysql/data:/var/lib/mysql
     ports:
@@ -44,17 +95,6 @@ services:
     environment:
       MYSQL_DATABASE: my_money_db
       MYSQL_ROOT_PASSWORD: password
-  # db:
-  #   image: postgres
-  #   container_name: postgres
-  #   volumes:
-  #     - ./postgresql/data:/var/lib/postgresql/data
-  #   ports:
-  #     - "5432:5432"
-  #   environment: 
-  #     POSTGRES_DB: blog
-  #     POSTGRES_USER: root 
-  #     POSTGRES_PASSWORD: password 
 
   # Application Service
   my-money-laravel:
@@ -64,25 +104,10 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./my-money-app:/var/www
+    # ports:
+    #   - "8000:8000"  # Altere a porta para 8000, que é a porta padrão do servidor embutido do PHP
+    # working_dir: /var/www
+    # command: php artisan serve --host=0.0.0.0 --port=8000 
     ports:
       - "9000:9000"
     working_dir: /var/www
-
-  #phpMyAdmin Service
-  # phpmyadmin:
-  #   image: phpmyadmin/phpmyadmin
-  #   container_name: phpmyadmin
-  #   ports:
-  #     - "3400:80"
-  #   depends_on:
-  #     - db
-  # pgadmin:
-  #   image: dpage/pgadmin4
-  #   container_name: pgAdmin
-  #   ports:
-  #     - "5050:80"
-  #   depends_on:
-  #     - db 
-  #   environment:
-  #     PGADMIN_DEFAULT_EMAIL: hanieasemi76@gmail.com
-  #     PGADMIN_DEFAULT_PASSWORD: password 

@@ -13,11 +13,12 @@ return new class extends Migration
     {
         Schema::create('clients', function (Blueprint $table) {
             $table->id();
-            $table->string('full_name');
-            $table->string('nick_name');
-            $table->string('cpf', 11)->unique();
-            $table->string('email')->unique();
-            $table->foreignId('password_id')->constrained('passwords');
+            $table->string('full_name')->nullable(false);
+            $table->string('shop_name')->default(null);
+            $table->string('cpf', 11)->unique()->default(null);
+            $table->string('cnpj', 14)->unique()->default(null);
+            $table->string('email')->unique()->nullable(false);
+            $table->string('password')->nullable(false);
             $table->timestamps();
             $table->softDeletes();
         });

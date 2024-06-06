@@ -1,37 +1,37 @@
-FROM php:8.2.11-fpm
+# FROM php:8.2.11-fpm
 
-# Install composer
-RUN echo "\e[1;33mInstall COMPOSER\e[0m"
-RUN cd /tmp \
-    && curl -sS https://getcomposer.org/installer | php \
-    && mv composer.phar /usr/local/bin/composer
+# # Install composer
+# RUN echo "\e[1;33mInstall COMPOSER\e[0m"
+# RUN cd /tmp \
+#     && curl -sS https://getcomposer.org/installer | php \
+#     && mv composer.phar /usr/local/bin/composer
 
-RUN docker-php-ext-install pdo pdo_mysql
+# RUN docker-php-ext-install pdo pdo_mysql
 
-RUN apt-get update
+# RUN apt-get update
 
-# Install useful tools
-RUN apt-get -y install apt-utils nano wget dialog vim
+# # Install useful tools
+# RUN apt-get -y install apt-utils nano wget dialog vim
 
-# Install important libraries
-RUN echo "\e[1;33mInstall important libraries\e[0m"
-RUN apt-get -y install --fix-missing \
-    apt-utils \
-    build-essential \
-    git \
-    curl \
-    libcurl4 \
-    libcurl4-openssl-dev \
-    zlib1g-dev \
-    libzip-dev \
-    zip \
-    libbz2-dev \
-    locales \
-    libmcrypt-dev \
-    libicu-dev \
-    libonig-dev \
-    libxml2-dev
-
+# # Install important libraries
+# RUN echo "\e[1;33mInstall important libraries\e[0m"
+# RUN apt-get -y install --fix-missing \
+#     apt-utils \
+#     build-essential \
+#     git \
+#     curl \
+#     libcurl4 \
+#     libcurl4-openssl-dev \
+#     zlib1g-dev \
+#     libzip-dev \
+#     zip \
+#     libbz2-dev \
+#     locales \
+#     libmcrypt-dev \
+#     libicu-dev \
+#     libonig-dev \
+#     libxml2-dev
+################################
 # # Set the working directory
 # WORKDIR /var/www
 
@@ -77,3 +77,48 @@ RUN apt-get -y install --fix-missing \
 
 
 # docker exec -it --user=root my-money-laravel chmod -R 777 /var/www/storage
+
+
+
+FROM php:8.2.11-fpm
+
+# Install composer
+RUN echo "\e[1;33mInstall COMPOSER\e[0m"
+RUN cd /tmp \
+    && curl -sS https://getcomposer.org/installer | php \
+    && mv composer.phar /usr/local/bin/composer
+
+RUN docker-php-ext-install pdo pdo_mysql
+
+RUN apt-get update
+
+# Install useful tools
+RUN apt-get -y install apt-utils nano wget dialog vim
+
+# Install important libraries
+RUN echo "\e[1;33mInstall important libraries\e[0m"
+RUN apt-get -y install --fix-missing \
+    apt-utils \
+    build-essential \
+    git \
+    curl \
+    libcurl4 \
+    libcurl4-openssl-dev \
+    zlib1g-dev \
+    libzip-dev \
+    zip \
+    libbz2-dev \
+    locales \
+    libicu-dev \
+    libonig-dev \
+    libxml2-dev
+
+# Set the working directory
+WORKDIR /var/www
+
+# Copy the existing application directory contents to the working directory
+COPY . /var/www
+
+# Expose port 9000 and start php-fpm server
+EXPOSE 9000
+CMD ["php-fpm"]
