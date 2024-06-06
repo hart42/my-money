@@ -29,19 +29,27 @@ class ClientService {
         try {
             DB::beginTransaction();
             $newClient = Client::create($data);
-            // validate account_type
+
             if(!isset($data['account_type'])) {
                 $data['account_type'] = isset($data['cpf']) ? 'client' : 'shop';
             }
             $newAccount = (new AccountService)->createFirstAccount($newClient->id, $data['account_type']);
             DB::commit();
 
-            return [
-                "client_id" => $newClient->id,
-                "account_id" => $newAccount->id,
-                "balance" => $newAccount->balance,
-                "account_type" => $newAccount->account_type,
-            ];
+            return response()->json(
+                [
+                    "message" => "Account created successfully!",
+                    "account" => [
+                        "account_id" => $newAccount->id,
+                        "balance" => $newAccount->balance,
+                        "account_type" => $newAccount->account_type,
+                    ],
+                    "client" => [
+                        "client_id" => $newClient->id,
+                        "full_name" => $newClient->full_name,
+                        "email" => $newClient->email,
+                    ],
+                ], 201) ;
         } catch (Exception $ex) {
             DB::rollBack();
             return response()->json([
