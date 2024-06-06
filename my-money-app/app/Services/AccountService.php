@@ -16,6 +16,7 @@ class AccountService {
                 "account_type" => $accountType,
             ];
             $newAccount = Account::create($accountData);
+            $newAccount->refresh();
             DB::commit();
 
             return $newAccount;
