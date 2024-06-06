@@ -14,6 +14,7 @@ use App\Http\Controllers\TransactionController;
 $router = app('router');
 $router->post('/create-client',              "App\Http\Controllers\ClientController@createNewClient");
 $router->patch('/deposit',                   "App\Http\Controllers\TransactionController@deposit");
+$router->patch('/withdraw',                   "App\Http\Controllers\TransactionController@withdraw");
 
 
 // Route::post('/create-client', [ClientController::class, 'createNewClient']);
