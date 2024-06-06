@@ -30,4 +30,20 @@ class TransactionController extends Controller
             ], 400);
         }
     }
+
+    public function withdraw(Request $request) {
+        try {
+            $rules = [
+                'payer' => 'int|required',
+                'value' => 'numeric|min:0.01|required',
+            ];
+            $validatedData = $this->validate($request, $rules);
+
+            return $this->transactionService->withdraw($validatedData);
+        } catch (Exception $ex) {
+            return response()->json([
+                'error_message' => $ex->getMessage()
+            ], 400);
+        }
+    }
 }
