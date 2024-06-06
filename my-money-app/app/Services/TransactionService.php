@@ -84,4 +84,55 @@ class TransactionService {
             ],
         ], 200);
     }
+
+    public function transfer(array $data) {
+        $transaction = DB::transaction(function () use ($data) {
+            $payer = Account::lockForUpdate()->find($data['payer']);
+            $payee = Account::lockForUpdate()->find($data['payee']);
+            if(!$payer || !$payee) {
+                return null;
+            }
+
+            if($payer->account_type === 'shop') {
+                return ['message' => 'payer cannot be a shopkeeper'];
+            }
+            if(($payer->balance - $data['value']) <= 0.00) {
+                return ['message' => 'insufficient funds!'];
+            }
+
+            $payer->balance -= $data['value'];
+            $payer->save();
+            $payee->balance += $data['value'];
+            $payee->save();
+
+            $transaction = Transaction::create([
+                'account_id' => $payer->id,
+                'transaction_type' => 'transfer',
+                'amount' => $data['value'],
+                'to_account_id' => $payee->id,
+            ]);
+            return $transaction;
+        });
+
+        if(is_null($transaction)) {
+            return response()->json([
+                'message' => 'Account not found!',
+            ], 404);
+        }
+
+        if(isset($transaction['message'])) {
+            return response()->json([
+                'message' => $transaction['message'],
+            ], 400);
+        }
+
+        return response()->json([
+            'message' => 'successfully transfer!',
+            'transfer' => [
+                'payer' => $transaction->account_id,
+                'payee' => $transaction->to_account_id,
+                'amount' => $transaction->amount,
+            ],
+        ], 200);
+    }
 }
