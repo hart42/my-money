@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Client;
 use Exception;
 use Illuminate\Support\Facades\DB;
+use App\Services\AccountService;
 
 class ClientService {
     
@@ -33,7 +34,8 @@ class ClientService {
             if(!isset($data['account_type'])) {
                 $data['account_type'] = isset($data['cpf']) ? 'client' : 'shop';
             }
-            $newAccount = (new AccountService)->createFirstAccount($newClient->id, $data['account_type']);
+            $accountService = new AccountService;
+            $newAccount = $accountService->createFirstAccount($newClient->id, $data['account_type']);
             DB::commit();
 
             return response()->json(
