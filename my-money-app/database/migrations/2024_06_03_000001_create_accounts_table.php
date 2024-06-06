@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('accounts', function (Blueprint $table) {
             $table->id();
             $table->foreignId('account_owner_id')->constrained('clients')->nullable(false);
-            $table->float('balance')->default(0)->nullable(false);
+            $table->float('balance')->default(0.00)->nullable(false);
             $table->enum('account_type', ['client', 'shop'])->nullable(false);
             $table->timestamps();
             $table->softDeletes();
