@@ -4,13 +4,23 @@ namespace App\Services;
 
 use App\Models\Client;
 use Exception;
-use Illuminate\Support\Facades\DB;
 use App\Services\AccountService;
+use Illuminate\Database\DatabaseManager;
 
 class ClientService {
-    
+
+    protected $dbm;
+    protected $client;
+    protected $accountService;
+
+    public function __construct(DatabaseManager $dbm, Client $client, AccountService $accountService) {
+        $this->dbm = $dbm;
+        $this->client = $client;
+        $this->accountService = $accountService;
+    }
+
     public function createNewClient(array $data) {
-        $query = Client::select('id')
+        $query = $this->client::select('id')
             ->where('email', $data['email']);
 
         if(isset($data['cpf'])) {
@@ -19,8 +29,8 @@ class ClientService {
         if(isset($data['cnpj'])) {
             $query->orWhere('cnpj', $data['cnpj']);
         }
-        $client_exist = $query->first();
-        if(!is_null($client_exist)) {
+        $clientExist = $query->first();
+        if(!is_null($clientExist)) {
             return response()->json([
                 'message' => 'client could not be created, inconsistent data!'
             ], 401);
@@ -28,15 +38,14 @@ class ClientService {
         $data['password'] = bcrypt($data['password']);
         
         try {
-            DB::beginTransaction();
-            $newClient = Client::create($data);
+            $this->dbm->beginTransaction();
+            $newClient = $this->client::create($data);
 
             if(!isset($data['account_type'])) {
                 $data['account_type'] = isset($data['cpf']) ? 'client' : 'shop';
             }
-            $accountService = new AccountService;
-            $newAccount = $accountService->createFirstAccount($newClient->id, $data['account_type']);
-            DB::commit();
+            $newAccount = $this->accountService->createFirstAccount($newClient->id, $data['account_type']);
+            $this->dbm->commit();
 
             return response()->json(
                 [
@@ -53,7 +62,7 @@ class ClientService {
                     ],
                 ], 201) ;
         } catch (Exception $ex) {
-            DB::rollBack();
+            $this->dbm->rollBack();
             return response()->json([
                 'error_message' => $ex->getMessage()
             ], 400);

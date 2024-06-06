@@ -4,12 +4,21 @@ namespace App\Services;
 
 use App\Models\Account;
 use App\Models\Transaction;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\DatabaseManager;
+
 
 class TransactionService {
 
+    protected $dbm;
+    protected $transaction;
+
+    public function __construct(DatabaseManager $dbm, Transaction $transaction) {
+        $this->dbm = $dbm;
+        $this->transaction = $transaction;
+    }
+
     public function deposit(array $data) {
-        $account = DB::transaction(function () use ($data) {
+        $account = $this->dbm->transaction(function () use ($data) {
             $account = Account::lockForUpdate()->find($data['payee']);
             if(!$account) {
                 return null;
@@ -18,7 +27,7 @@ class TransactionService {
             $account->balance += $data['value'];
             $account->save();
 
-            Transaction::create([
+            $this->transaction::create([
                 'account_id' => $account->id,
                 'transaction_type' => 'deposit',
                 'amount' => $data['value'],
@@ -43,7 +52,7 @@ class TransactionService {
     }
 
     public function withdraw(array $data) {
-        $account = DB::transaction(function () use ($data) {
+        $account = $this->dbm->transaction(function () use ($data) {
             $account = Account::lockForUpdate()->find($data['payer']);
             if(!$account) {
                 return null;
@@ -55,7 +64,7 @@ class TransactionService {
             $account->balance -= $data['value'];
             $account->save();
 
-            Transaction::create([
+            $this->transaction::create([
                 'account_id' => $account->id,
                 'transaction_type' => 'withdraw',
                 'amount' => $data['value'],
@@ -86,7 +95,7 @@ class TransactionService {
     }
 
     public function transfer(array $data) {
-        $transaction = DB::transaction(function () use ($data) {
+        $transaction = $this->dbm->transaction(function () use ($data) {
             $payer = Account::lockForUpdate()->find($data['payer']);
             $payee = Account::lockForUpdate()->find($data['payee']);
             if(!$payer || !$payee) {
@@ -105,7 +114,7 @@ class TransactionService {
             $payee->balance += $data['value'];
             $payee->save();
 
-            $transaction = Transaction::create([
+            $transaction = $this->transaction::create([
                 'account_id' => $payer->id,
                 'transaction_type' => 'transfer',
                 'amount' => $data['value'],
