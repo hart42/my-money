@@ -11,6 +11,11 @@ class TransactionFeatureTest extends TestCase
 {
     use DatabaseTransactions;
 
+    public function setUp(): void {
+        parent::setUp();
+        $this->withoutMiddleware();
+    }
+
     /**
      * Test missing parameters when deposit value
      */
