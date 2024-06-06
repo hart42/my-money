@@ -17,7 +17,7 @@ class ClientFeatureTest extends TestCase
     public function test_missing_cpf_cnpj_parameters_when_create_client() {
         $parameters = [
             'full_name' => 'test',
-            'email' => 'test@email.com',
+            'email' => 'testClientFeture@email.com',
             'password' => '@123test',
         ];
         $response = $this->json('POST', '/create-client', $parameters);
@@ -27,6 +27,7 @@ class ClientFeatureTest extends TestCase
                 "error_message" => "The cpf field is required when cnpj is not present. (and 1 more error)"
             ]);
     }
+
     /**
      * Test missing parameters when create a client : email
      */
@@ -34,7 +35,7 @@ class ClientFeatureTest extends TestCase
         $parameters = [
             'full_name' => 'test',
             'password' => '@123test',
-            'cpf' => '12345678911',
+            'cpf' => '98765432132',
         ];
         $response = $this->json('POST', '/create-client', $parameters);
 
@@ -50,10 +51,10 @@ class ClientFeatureTest extends TestCase
      */
     public function test_missing_full_name_parameters_when_create_client() {
         $parameters = [
-            'email' => 'test@email.com',
+            'email' => 'testClientFeture@email.com',
             'password' => '@123test',
-            'cpf' => '12345678911',
-            'cnpj' => '12345678911234',
+            'cpf' => '98765432132',
+            'cnpj' => '99999999999999',
         ];
         $response = $this->json('POST', '/create-client', $parameters);
 
@@ -70,8 +71,8 @@ class ClientFeatureTest extends TestCase
     public function test_missing_password_parameters_when_create_client() {
         $parameters = [
             'full_name' => 'test',
-            'email' => 'test@email.com',
-            'cnpj' => '12345678911234',
+            'email' => 'testClientFeture@email.com',
+            'cnpj' => '99999999999999',
         ];
         $response = $this->json('POST', '/create-client', $parameters);
 
@@ -88,8 +89,8 @@ class ClientFeatureTest extends TestCase
     public function test_wrong_parameter_value_when_create_client() {
         $parameters = [
             'full_name' => 'test',
-            'email' => 'test@email.com',
-            'cnpj' => '12345678911234',
+            'email' => 'testClientFeture@email.com',
+            'cnpj' => '99999999999999',
             "password" => '@123test',
             'account_type' => 'wrong',
         ];
@@ -103,19 +104,18 @@ class ClientFeatureTest extends TestCase
     }
 
     /**
-     * Test create a client successfully 
+     * Test create a client successfully without an account_type and became a client account
      */
     public function test_create_client_without_account_type_successfully() {
         $parameters = [
             'full_name' => 'test',
-            'email' => 'test@email.com',
+            'email' => 'testClientFeture@email.com',
             'password' => '@123test',
-            'cpf' => '12345678911',
-            'cnpj' => '12345678911234',
+            'cpf' => '98765432132',
+            'cnpj' => '99999999999999',
         ];
         $response = $this->json('POST', '/create-client', $parameters);
 
-        dd($response->json());
         $response
             ->assertStatus(201)
             ->assertJsonStructure([
@@ -126,11 +126,155 @@ class ClientFeatureTest extends TestCase
                     "account_type",
                 ],
                 "client" => [
+                    "client_id",
                     "full_name",
                     "email"
                 ]
+            ])
+            ->assertJson([
+                'message' => 'Account created successfully!',
             ]);
-        $responseData = $response->json();
-        $this->assertContainsEquals("Account created successfully!", $responseData["message"]);
+
+        $this->assertDatabaseHas('accounts', [
+            'id' => $response->json('account.account_id'),
+            'balance' => 0.00,
+            'account_type' => 'client',
+        ]);
+
+        $this->assertDatabaseHas('clients', [
+            'id' => $response->json('client.client_id'),
+            'email' => $response->json('client.email'),
+        ]);
+    }
+
+    /**
+     * Test create a client successfully without an account_type and became a shop account
+     */
+    public function test_create_client_without_account_type_became_shop_account_successfully() {
+        $parameters = [
+            'full_name' => 'test',
+            'email' => 'testClientFeture@email.com',
+            'password' => '@123test',
+            'cnpj' => '99999999999999',
+        ];
+        $response = $this->json('POST', '/create-client', $parameters);
+
+        $response
+            ->assertStatus(201)
+            ->assertJsonStructure([
+                "message",
+                "account" => [
+                    "account_id",
+                    "balance",
+                    "account_type",
+                ],
+                "client" => [
+                    "client_id",
+                    "full_name",
+                    "email"
+                ]
+            ])
+            ->assertJson([
+                'message' => 'Account created successfully!',
+            ]);
+
+        $this->assertDatabaseHas('accounts', [
+            'id' => $response->json('account.account_id'),
+            'balance' => 0.00,
+            'account_type' => 'shop',
+        ]);
+
+        $this->assertDatabaseHas('clients', [
+            'id' => $response->json('client.client_id'),
+            'email' => $response->json('client.email'),
+        ]);
+    }
+
+    /**
+     * Test create a client successfully with account_type client
+     */
+    public function test_create_client_with_account_type_client_successfully() {
+        $parameters = [
+            'full_name' => 'test',
+            'email' => 'testClientFeture@email.com',
+            'password' => '@123test',
+            'cpf' => '98765432132',
+            'account_type' => 'client',
+        ];
+        $response = $this->json('POST', '/create-client', $parameters);
+
+        $response
+            ->assertStatus(201)
+            ->assertJsonStructure([
+                "message",
+                "account" => [
+                    "account_id",
+                    "balance",
+                    "account_type",
+                ],
+                "client" => [
+                    "client_id",
+                    "full_name",
+                    "email"
+                ]
+            ])
+            ->assertJson([
+                'message' => 'Account created successfully!',
+            ]);
+
+        $this->assertDatabaseHas('accounts', [
+            'id' => $response->json('account.account_id'),
+            'balance' => 0.00,
+            'account_type' => 'client',
+        ]);
+
+        $this->assertDatabaseHas('clients', [
+            'id' => $response->json('client.client_id'),
+            'email' => $response->json('client.email'),
+        ]);
+    }
+
+    /**
+     * Test create a client successfully with account_type shop
+     */
+    public function test_create_client_with_account_type_shop_successfully() {
+        $parameters = [
+            'full_name' => 'test',
+            'email' => 'testClientFeture@email.com',
+            'password' => '@123test',
+            'cnpj' => '99999999999999',
+            'account_type' => 'shop',
+        ];
+        $response = $this->json('POST', '/create-client', $parameters);
+
+        $response
+            ->assertStatus(201)
+            ->assertJsonStructure([
+                "message",
+                "account" => [
+                    "account_id",
+                    "balance",
+                    "account_type",
+                ],
+                "client" => [
+                    "client_id",
+                    "full_name",
+                    "email"
+                ]
+            ])
+            ->assertJson([
+                'message' => 'Account created successfully!',
+            ]);
+
+        $this->assertDatabaseHas('accounts', [
+            'id' => $response->json('account.account_id'),
+            'balance' => 0.00,
+            'account_type' => 'shop',
+        ]);
+
+        $this->assertDatabaseHas('clients', [
+            'id' => $response->json('client.client_id'),
+            'email' => $response->json('client.email'),
+        ]);
     }
 }
