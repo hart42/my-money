@@ -46,4 +46,21 @@ class TransactionController extends Controller
             ], 400);
         }
     }
+
+    public function transfer(Request $request) {
+        try {
+            $rules = [
+                'value' => 'numeric|min:0.01|required',
+                'payer' => 'int|required',
+                'payee' => 'int|required',
+            ];
+            $validatedData = $this->validate($request, $rules);
+
+            return $this->transactionService->transfer($validatedData);
+        } catch (Exception $ex) {
+            return response()->json([
+                'error_message' => $ex->getMessage()
+            ], 400);
+        }
+    }
 }
