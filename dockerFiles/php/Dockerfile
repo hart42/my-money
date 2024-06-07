@@ -27,53 +27,16 @@ RUN apt-get -y install --fix-missing \
     zip \
     libbz2-dev \
     locales \
-    libmcrypt-dev \
     libicu-dev \
     libonig-dev \
     libxml2-dev
 
-# # Set the working directory
-# WORKDIR /var/www
+# Set the working directory
+WORKDIR /var/www
 
-# # Copy the application code
-# COPY . .
+# Copy the existing application directory contents to the working directory
+COPY . /var/www
 
-# # Set permissions for Laravel storage directory
-# RUN mkdir -p /var/www/storage \
-#     && chown -R www-data:www-data /var/www/storage \
-#     && chmod -R 775 /var/www/storage
-
-# # Set environment variable to allow composer to run as root
-# ENV COMPOSER_ALLOW_SUPERUSER=1
-
-# # Run composer install to install dependencies
-# RUN composer install --no-interaction --optimize-autoloader
-
-# # Set permissions for Laravel storage and cache directories
-# RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
-#     && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
-
-# RUN echo "\e[1;33mInstall important docker dependencies\e[0m"
-# RUN docker-php-ext-install \
-#     exif \
-#     pcntl \
-#     bcmath \
-#     ctype \
-#     curl \
-#     iconv \
-#     xml \
-#     soap \
-#     pcntl \
-#     mbstring \
-#     tokenizer \
-#     bz2 \
-#     zip \
-#     intl
-
-# # Install Postgre PDO
-# RUN apt-get install -y libpq-dev \
-#     && docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
-#     && docker-php-ext-install pdo pdo_pgsql pgsql
-
-
-# docker exec -it --user=root my-money-laravel chmod -R 777 /var/www/storage
+# Expose port 9000 and start php-fpm server
+EXPOSE 9000
+CMD ["php-fpm"]

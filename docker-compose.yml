@@ -1,26 +1,7 @@
-# version: '3.9'
-# services:
-#   my-money-laravel:
-#     container_name: my-money-laravel
-#     build: .
-#     volumes:
-#       - ./my-money-app-app:/var/www/html
-#     ports:
-#       - 9000:80
-  
-#   mysql_db:
-#     image: mysql:latest
-#     environment:
-#       MYSQL_ROOT_PASSWORD: root
-#       MYSQL_DATABASE: my_money_db
-#     ports:
-#     - 3306:3306
-
 version: '3.9'
 
 services:
-
-  # Web Server Service
+  #Web Server Service
   nginx:
     image: nginx:alpine
     container_name: nginx
@@ -33,10 +14,10 @@ services:
       - my-money-laravel
       - db
 
-  #Database Service
+  # Database Service
   db:
-    image : mysql
-    container_name : mysql-my-money
+    image: mysql
+    container_name: mysql-my-money
     volumes:
       - ./mysql/data:/var/lib/mysql
     ports:
@@ -44,17 +25,6 @@ services:
     environment:
       MYSQL_DATABASE: my_money_db
       MYSQL_ROOT_PASSWORD: password
-  # db:
-  #   image: postgres
-  #   container_name: postgres
-  #   volumes:
-  #     - ./postgresql/data:/var/lib/postgresql/data
-  #   ports:
-  #     - "5432:5432"
-  #   environment: 
-  #     POSTGRES_DB: blog
-  #     POSTGRES_USER: root 
-  #     POSTGRES_PASSWORD: password 
 
   # Application Service
   my-money-laravel:
@@ -67,22 +37,3 @@ services:
     ports:
       - "9000:9000"
     working_dir: /var/www
-
-  #phpMyAdmin Service
-  # phpmyadmin:
-  #   image: phpmyadmin/phpmyadmin
-  #   container_name: phpmyadmin
-  #   ports:
-  #     - "3400:80"
-  #   depends_on:
-  #     - db
-  # pgadmin:
-  #   image: dpage/pgadmin4
-  #   container_name: pgAdmin
-  #   ports:
-  #     - "5050:80"
-  #   depends_on:
-  #     - db 
-  #   environment:
-  #     PGADMIN_DEFAULT_EMAIL: hanieasemi76@gmail.com
-  #     PGADMIN_DEFAULT_PASSWORD: password 
