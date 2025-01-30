@@ -44,6 +44,14 @@ class ClientService {
             if(!isset($data['account_type'])) {
                 $data['account_type'] = isset($data['cpf']) ? 'client' : 'shop';
             }
+
+            if($data['account_type'] == 'shop') {
+                if(!isset($data['cnpj']) || empty($data['cnpj'])) {
+                    return response()->json([
+                        'message' => 'client could not be created, shop accounts must have CNPJ!'
+                    ], 400);
+                }
+            }
             $newAccount = $this->accountService->createFirstAccount($newClient->id, $data['account_type']);
             $this->dbm->commit();
 
